@@ -22,7 +22,13 @@
       "dummy"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "file": "fonts/Roboto/Roboto-Medium.ttf",
+          "name": "ROBOTO_MEDIUM_56",
+          "type": "font"
+        }
+      ]
     }
   }
 }
