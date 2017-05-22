@@ -3,19 +3,20 @@
 #include "fonts.h"
 
 static Window *s_main_window;
+static TextLayer *s_date_layer;
 static TextLayer *s_time_layer;
 
 static void update_time() {
-  // Get a tm structure
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
 
-  // Write the current hours and minutes into a buffer
-  static char s_buffer[8];
-  strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);
+  static char s_time_buffer[8];
+  strftime(s_time_buffer, sizeof(s_time_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);
+  text_layer_set_text(s_time_layer, s_time_buffer);
 
-  // Display this time on the TextLayer
-  text_layer_set_text(s_time_layer, s_buffer);
+  static char s_date_buffer[16];
+  strftime(s_date_buffer, sizeof(s_date_buffer), tick_time->tm_mday < 10 ? "%a,%e %b" : "%a, %d %b", tick_time);
+  text_layer_set_text(s_date_layer, s_date_buffer);
 }
 
 
@@ -24,11 +25,15 @@ static void main_window_load(Window *window) {
 
   Layer *window_layer = window_get_root_layer(window);
 
+  s_date_layer = create_date_layer();
+  layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
+
   s_time_layer = create_time_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 }
 
 static void main_window_unload(Window *window) {
+  text_layer_destroy(s_date_layer);
   text_layer_destroy(s_time_layer);
   unload_fonts();
 }
