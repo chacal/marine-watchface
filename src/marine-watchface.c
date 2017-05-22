@@ -3,6 +3,7 @@
 #include "fonts.h"
 
 static Window *s_main_window;
+static Layer *s_canvas_layer;
 static TextLayer *s_date_layer;
 static TextLayer *s_time_layer;
 
@@ -19,23 +20,33 @@ static void update_time() {
   text_layer_set_text(s_date_layer, s_date_buffer);
 }
 
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  graphics_context_set_stroke_color(ctx, GColorClear);
+  graphics_draw_line(ctx, GPoint(0, 88), GPoint(144, 88));
+}
 
 static void main_window_load(Window *window) {
   load_fonts();
   window_set_background_color(window, GColorBlack);
 
   Layer *window_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(window_layer);
 
   s_time_layer = create_time_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 
   s_date_layer = create_date_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
+
+  s_canvas_layer = layer_create(bounds);
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(window_layer, s_canvas_layer);
 }
 
 static void main_window_unload(Window *window) {
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_time_layer);
+  layer_destroy(s_canvas_layer);
   unload_fonts();
 }
 
