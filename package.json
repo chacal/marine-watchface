@@ -22,6 +22,16 @@
     "resources": {
       "media": [
         {
+          "file": "fonts/Roboto/Roboto-Regular.ttf",
+          "name": "ROBOTO_REGULAR_12",
+          "type": "font"
+        },
+        {
+          "file": "fonts/Roboto/Roboto-Medium.ttf",
+          "name": "ROBOTO_MEDIUM_20",
+          "type": "font"
+        },
+        {
           "file": "fonts/Roboto/Roboto-Medium.ttf",
           "name": "ROBOTO_MEDIUM_56",
           "type": "font"
