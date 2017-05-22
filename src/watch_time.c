@@ -3,7 +3,7 @@
 
 TextLayer* create_time_layer() {
   // Create the TextLayer with specific bounds
-  TextLayer *time_layer = text_layer_create(GRect(0, 52, 144, 60));
+  TextLayer *time_layer = text_layer_create(GRect(0, 20, 144, 60));
 
   // Improve the layout to be more like a watchface
   text_layer_set_background_color(time_layer, GColorClear);
