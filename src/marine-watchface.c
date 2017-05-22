@@ -1,9 +1,9 @@
 #include <pebble.h>
 #include "watch_time.h"
+#include "fonts.h"
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
-static GFont s_time_font;
 
 static void update_time() {
   // Get a tm structure
@@ -20,18 +20,17 @@ static void update_time() {
 
 
 static void main_window_load(Window *window) {
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_ROBOTO_MEDIUM_56));
+  load_fonts();
 
   Layer *window_layer = window_get_root_layer(window);
 
-  s_time_layer = create_time_layer(s_time_font);
-
+  s_time_layer = create_time_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 }
 
 static void main_window_unload(Window *window) {
   text_layer_destroy(s_time_layer);
-  fonts_unload_custom_font(s_time_font);
+  unload_fonts();
 }
 
 
