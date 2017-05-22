@@ -1,11 +1,15 @@
 #include <pebble.h>
 #include "watch_time.h"
 #include "fonts.h"
+#include "forecast.h"
 
 static Window *s_main_window;
 static Layer *s_canvas_layer;
 static TextLayer *s_date_layer;
 static TextLayer *s_time_layer;
+static TextLayer *s_wind_layer;
+static TextLayer *s_temperature_layer;
+static TextLayer *s_pressure_layer;
 
 static void update_time() {
   time_t temp = time(NULL);
@@ -38,6 +42,18 @@ static void main_window_load(Window *window) {
   s_date_layer = create_date_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
+  s_wind_layer = create_forecast_data_layer(GRect(0, 99, 58, 20));
+  text_layer_set_text(s_wind_layer, "9 NW");
+  layer_add_child(window_layer, text_layer_get_layer(s_wind_layer));
+
+  s_temperature_layer = create_forecast_data_layer(GRect(53, 99, 38, 20));
+  text_layer_set_text(s_temperature_layer, "17");
+  layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
+
+  s_pressure_layer = create_forecast_data_layer(GRect(93, 99, 48, 20));
+  text_layer_set_text(s_pressure_layer, "1021");
+  layer_add_child(window_layer, text_layer_get_layer(s_pressure_layer));
+
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
@@ -46,6 +62,9 @@ static void main_window_load(Window *window) {
 static void main_window_unload(Window *window) {
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_time_layer);
+  text_layer_destroy(s_wind_layer);
+  text_layer_destroy(s_temperature_layer);
+  text_layer_destroy(s_pressure_layer);
   layer_destroy(s_canvas_layer);
   unload_fonts();
 }
