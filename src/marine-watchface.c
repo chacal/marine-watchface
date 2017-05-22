@@ -13,6 +13,7 @@ static TextLayer *s_temperature_layer;
 static TextLayer *s_temperature_unit_layer;
 static TextLayer *s_pressure_layer;
 static TextLayer *s_pressure_unit_layer;
+static TextLayer *s_observation_station_layer;
 
 static void update_time() {
   time_t temp = time(NULL);
@@ -69,6 +70,10 @@ static void main_window_load(Window *window) {
   text_layer_set_text(s_pressure_unit_layer, "mbar");
   layer_add_child(window_layer, text_layer_get_layer(s_pressure_unit_layer));
 
+  s_observation_station_layer = create_forecast_unit_layer(GRect(0, 142, 144, 20));
+  text_layer_set_text(s_observation_station_layer, "Helsinki Harmaja");
+  layer_add_child(window_layer, text_layer_get_layer(s_observation_station_layer));
+
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
@@ -83,6 +88,7 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(s_temperature_unit_layer);
   text_layer_destroy(s_pressure_layer);
   text_layer_destroy(s_pressure_unit_layer);
+  text_layer_destroy(s_observation_station_layer);
   layer_destroy(s_canvas_layer);
   unload_fonts();
 }
