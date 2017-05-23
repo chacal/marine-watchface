@@ -53,7 +53,7 @@ static void main_window_load(Window *window) {
   text_layer_set_text(s_wind_unit_layer, "m/s");
   layer_add_child(window_layer, text_layer_get_layer(s_wind_unit_layer));
 
-  s_temperature_layer = create_forecast_data_layer(GRect(53, 99, 38, 20));
+  s_temperature_layer = create_forecast_data_layer(GRect(57, 99, 30, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
 
   s_temperature_unit_layer = create_forecast_unit_layer(GRect(48, 99+22, 48, 20));
