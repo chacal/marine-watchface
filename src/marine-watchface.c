@@ -32,6 +32,22 @@ static void update_time() {
   text_layer_set_text(s_date_layer, s_date_buffer);
 }
 
+static void request_observations() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  if (!iter) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to sen App Message to phone!");
+    return;
+  }
+
+  int value = 1;
+  dict_write_int(iter, 0, &value, sizeof(int), true);
+  dict_write_end(iter);
+
+  app_message_outbox_send();
+}
+
 static void sync_error_callback(DictionaryResult dict_error, AppMessageResult app_message_error, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Sync Error: %d", app_message_error);
 }
@@ -125,6 +141,9 @@ static void main_window_unload(Window *window) {
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
+  if(tick_time->tm_min % 15 == 0) {
+    request_observations();
+  }
 }
 
 
