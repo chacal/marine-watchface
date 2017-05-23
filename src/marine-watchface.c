@@ -14,6 +14,7 @@ static TextLayer *s_temperature_unit_layer;
 static TextLayer *s_pressure_layer;
 static TextLayer *s_pressure_unit_layer;
 static TextLayer *s_observation_station_layer;
+static TextLayer *s_last_update_layer;
 static int s_battery_level;
 static bool s_bt_connected;
 static bool s_phone_ready;
@@ -22,6 +23,7 @@ static char s_wind_buf[16] = "-";
 static char s_temperature_buf[16] = "-";
 static char s_pressure_buf[16] = "-";
 static char s_observation_station_buf[128] = "-";
+static char s_last_update_buf[16] = "-";
 
 #define APP_SYNC_BUFFER_SIZE 128
 static AppSync s_sync;
@@ -53,6 +55,11 @@ static void update_observation(const uint32_t key) {
   } else if(key == MESSAGE_KEY_ObservationStation) {
     persist_read_string(MESSAGE_KEY_ObservationStation, s_observation_station_buf, 128);
     text_layer_set_text(s_observation_station_layer, s_observation_station_buf);
+  } else if(key == MESSAGE_KEY_LastObservationUpdate) {
+    int32_t last_update = persist_read_int(MESSAGE_KEY_LastObservationUpdate);
+    struct tm *time = localtime(&last_update);
+    strftime(s_last_update_buf, 16, "%H:%M", time);
+    text_layer_set_text(s_last_update_layer, s_last_update_buf);
   }
 }
 
@@ -151,8 +158,11 @@ static void main_window_load(Window *window) {
   text_layer_set_text(s_pressure_unit_layer, "mbar");
   layer_add_child(window_layer, text_layer_get_layer(s_pressure_unit_layer));
 
-  s_observation_station_layer = create_forecast_unit_layer(GRect(0, 142, 144, 20));
+  s_observation_station_layer = create_forecast_unit_layer(GRect(0, 137, 144, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_observation_station_layer));
+
+  s_last_update_layer = create_forecast_unit_layer(GRect(0, 152, 144, 20));
+  layer_add_child(window_layer, text_layer_get_layer(s_last_update_layer));
 
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -183,6 +193,7 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(s_pressure_layer);
   text_layer_destroy(s_pressure_unit_layer);
   text_layer_destroy(s_observation_station_layer);
+  text_layer_destroy(s_last_update_layer);
   layer_destroy(s_canvas_layer);
   unload_fonts();
 }
