@@ -14,6 +14,7 @@ static TextLayer *s_temperature_unit_layer;
 static TextLayer *s_pressure_layer;
 static TextLayer *s_pressure_unit_layer;
 static TextLayer *s_observation_station_layer;
+static int s_battery_level;
 
 #define APP_SYNC_BUFFER_SIZE 128
 static AppSync s_sync;
@@ -66,7 +67,15 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, GColorClear);
+  graphics_context_set_fill_color(ctx, GColorClear);
+
   graphics_draw_line(ctx, GPoint(0, 88), GPoint(144, 88));
+
+  int battery_height = s_battery_level / 10;
+  GPoint battery_origin = GPoint(2, 168-2);
+  graphics_draw_rect(ctx, GRect(battery_origin.x, battery_origin.y - 12, 4, 12));
+  graphics_draw_rect(ctx, GRect(battery_origin.x + 1, battery_origin.y - 13, 2, 1));
+  graphics_fill_rect(ctx, GRect(battery_origin.x + 1, battery_origin.y - 1 - battery_height, 2, battery_height), 0, GCornerNone);
 }
 
 static void main_window_load(Window *window) {
@@ -146,25 +155,23 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   }
 }
 
+static void battery_callback(BatteryChargeState state) {
+  s_battery_level = state.charge_percent;
+  layer_mark_dirty(s_canvas_layer);
+}
 
 static void init() {
-  // Create main Window element and assign to pointer
   s_main_window = window_create();
-
-  // Set handlers to manage the elements inside the Window
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = main_window_load,
     .unload = main_window_unload
   });
-
-  // Show the Window on the watch, with animated=true
   window_stack_push(s_main_window, true);
 
   update_time();
 
-  // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-
+  battery_state_service_subscribe(battery_callback);
   app_message_open(APP_SYNC_BUFFER_SIZE, APP_SYNC_BUFFER_SIZE);
 }
 
