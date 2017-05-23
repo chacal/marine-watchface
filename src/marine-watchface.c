@@ -188,6 +188,7 @@ static void init() {
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   battery_state_service_subscribe(battery_callback);
+  battery_callback(battery_state_service_peek());
   connection_service_subscribe((ConnectionHandlers) {
       .pebble_app_connection_handler = bluetooth_callback
   });
