@@ -16,6 +16,7 @@ static TextLayer *s_pressure_unit_layer;
 static TextLayer *s_observation_station_layer;
 static int s_battery_level;
 static bool s_bt_connected;
+static bool s_phone_ready;
 
 static char s_wind_buf[16] = "-";
 static char s_temperature_buf[16] = "-";
@@ -56,6 +57,8 @@ static void update_observation(const uint32_t key) {
 }
 
 static void request_observations() {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Requesting new observations..");
+
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
 
@@ -76,6 +79,11 @@ static void sync_error_callback(DictionaryResult dict_error, AppMessageResult ap
 }
 
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
+  if(key == MESSAGE_KEY_Ready && strcmp(new_tuple->value->cstring, "ready") == 0 && !s_phone_ready) {
+    s_phone_ready = true;
+    request_observations();
+  }
+
   if(old_tuple) {  // old_tuple exists -> this is not the initial callback, but triggered by data from the phone -> persist the new data
     persist_write_string(key, new_tuple->value->cstring);
   }
@@ -147,7 +155,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, s_canvas_layer);
 
   Tuplet initial_values[] = {
-      TupletInteger(MESSAGE_KEY_Ready, (uint8_t)0),
+      TupletCString(MESSAGE_KEY_Ready, ""),
       TupletCString(MESSAGE_KEY_Wind, ""),
       TupletCString(MESSAGE_KEY_Temperature, ""),
       TupletCString(MESSAGE_KEY_Pressure, ""),
