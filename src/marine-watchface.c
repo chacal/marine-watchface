@@ -47,7 +47,6 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   s_wind_layer = create_forecast_data_layer(GRect(0, 99, 58, 20));
-  text_layer_set_text(s_wind_layer, "9 NW");
   layer_add_child(window_layer, text_layer_get_layer(s_wind_layer));
 
   s_wind_unit_layer = create_forecast_unit_layer(GRect(7, 99+22, 48, 20));
@@ -55,7 +54,6 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_wind_unit_layer));
 
   s_temperature_layer = create_forecast_data_layer(GRect(53, 99, 38, 20));
-  text_layer_set_text(s_temperature_layer, "17");
   layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
 
   s_temperature_unit_layer = create_forecast_unit_layer(GRect(48, 99+22, 48, 20));
@@ -63,7 +61,6 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_temperature_unit_layer));
 
   s_pressure_layer = create_forecast_data_layer(GRect(93, 99, 48, 20));
-  text_layer_set_text(s_pressure_layer, "1021");
   layer_add_child(window_layer, text_layer_get_layer(s_pressure_layer));
 
   s_pressure_unit_layer = create_forecast_unit_layer(GRect(94, 99+22, 48, 20));
@@ -71,7 +68,6 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_pressure_unit_layer));
 
   s_observation_station_layer = create_forecast_unit_layer(GRect(0, 142, 144, 20));
-  text_layer_set_text(s_observation_station_layer, "Helsinki Harmaja");
   layer_add_child(window_layer, text_layer_get_layer(s_observation_station_layer));
 
   s_canvas_layer = layer_create(bounds);
