@@ -17,6 +17,11 @@ static TextLayer *s_observation_station_layer;
 static int s_battery_level;
 static bool s_bt_connected;
 
+static char s_wind_buf[16];
+static char s_temperature_buf[16];
+static char s_pressure_buf[16];
+static char s_observation_station_buf[128];
+
 #define APP_SYNC_BUFFER_SIZE 128
 static AppSync s_sync;
 static uint8_t s_sync_buffer[APP_SYNC_BUFFER_SIZE];
@@ -32,6 +37,22 @@ static void update_time() {
   static char s_date_buffer[16];
   strftime(s_date_buffer, sizeof(s_date_buffer), tick_time->tm_mday < 10 ? "%a,%e %b" : "%a, %d %b", tick_time);
   text_layer_set_text(s_date_layer, s_date_buffer);
+}
+
+static void update_observation(const uint32_t key) {
+  if(key == MESSAGE_KEY_Wind) {
+    persist_read_string(MESSAGE_KEY_Wind, s_wind_buf, 16);
+    text_layer_set_text(s_wind_layer, s_wind_buf);
+  } else if(key == MESSAGE_KEY_Temperature) {
+    persist_read_string(MESSAGE_KEY_Temperature, s_temperature_buf, 16);
+    text_layer_set_text(s_temperature_layer, s_temperature_buf);
+  } else if(key == MESSAGE_KEY_Pressure) {
+    persist_read_string(MESSAGE_KEY_Pressure, s_pressure_buf, 16);
+    text_layer_set_text(s_pressure_layer, s_pressure_buf);
+  } else if(key == MESSAGE_KEY_ObservationStation) {
+    persist_read_string(MESSAGE_KEY_ObservationStation, s_observation_station_buf, 128);
+    text_layer_set_text(s_observation_station_layer, s_observation_station_buf);
+  }
 }
 
 static void request_observations() {
@@ -55,15 +76,8 @@ static void sync_error_callback(DictionaryResult dict_error, AppMessageResult ap
 }
 
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
-  if(key == MESSAGE_KEY_Wind) {
-    text_layer_set_text(s_wind_layer, new_tuple->value->cstring);
-  } else if(key == MESSAGE_KEY_Temperature) {
-    text_layer_set_text(s_temperature_layer, new_tuple->value->cstring);
-  } else if(key == MESSAGE_KEY_Pressure) {
-    text_layer_set_text(s_pressure_layer, new_tuple->value->cstring);
-  } else if(key == MESSAGE_KEY_ObservationStation) {
-    text_layer_set_text(s_observation_station_layer, new_tuple->value->cstring);
-  }
+  persist_write_string(key, new_tuple->value->cstring);
+  update_observation(key);
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
