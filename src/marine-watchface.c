@@ -84,7 +84,7 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
     request_observations();
   }
 
-  if(old_tuple) {  // old_tuple exists -> this is not the initial callback, but triggered by data from the phone -> persist the new data
+  if(strcmp(new_tuple->value->cstring, "") != 0) {
     persist_write_string(key, new_tuple->value->cstring);
   }
   update_observation(key);
