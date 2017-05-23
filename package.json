@@ -18,6 +18,7 @@
     },
     "messageKeys": [
       "Ready",
+      "LastObservationUpdate",
       "Wind",
       "Temperature",
       "Pressure",

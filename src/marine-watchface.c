@@ -81,10 +81,14 @@ static void sync_error_callback(DictionaryResult dict_error, AppMessageResult ap
 static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
   if(key == MESSAGE_KEY_Ready && strcmp(new_tuple->value->cstring, "ready") == 0 && !s_phone_ready) {
     s_phone_ready = true;
-    request_observations();
+    if(time(NULL) - persist_read_int(MESSAGE_KEY_LastObservationUpdate) > 5 * 60) {
+      request_observations();
+    }
   }
 
-  if(strcmp(new_tuple->value->cstring, "") != 0) {
+  if(key == MESSAGE_KEY_LastObservationUpdate && new_tuple->value->uint32 != 0) {
+    persist_write_int(MESSAGE_KEY_LastObservationUpdate, new_tuple->value->uint32);
+  } else if(strcmp(new_tuple->value->cstring, "") != 0) {
     persist_write_string(key, new_tuple->value->cstring);
   }
   update_observation(key);
@@ -156,6 +160,7 @@ static void main_window_load(Window *window) {
 
   Tuplet initial_values[] = {
       TupletCString(MESSAGE_KEY_Ready, ""),
+      TupletInteger(MESSAGE_KEY_LastObservationUpdate, 0),
       TupletCString(MESSAGE_KEY_Wind, ""),
       TupletCString(MESSAGE_KEY_Temperature, ""),
       TupletCString(MESSAGE_KEY_Pressure, ""),

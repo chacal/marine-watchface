@@ -47,6 +47,7 @@ function updateWeather() {
       data[messageKeys.Temperature] = Math.round(result.observations.temperature) + ''
       data[messageKeys.Pressure] = Math.round(result.observations.pressureMbar) + ''
       data[messageKeys.ObservationStation] = result.station.name
+      data[messageKeys.LastObservationUpdate] = Math.round(new Date().getTime() / 1000)
 
       Pebble.sendAppMessage(data)
     })
