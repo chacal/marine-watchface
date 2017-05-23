@@ -15,6 +15,7 @@ static TextLayer *s_pressure_layer;
 static TextLayer *s_pressure_unit_layer;
 static TextLayer *s_observation_station_layer;
 static int s_battery_level;
+static bool s_bt_connected;
 
 #define APP_SYNC_BUFFER_SIZE 128
 static AppSync s_sync;
@@ -76,6 +77,16 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_rect(ctx, GRect(battery_origin.x, battery_origin.y - 12, 4, 12));
   graphics_draw_rect(ctx, GRect(battery_origin.x + 1, battery_origin.y - 13, 2, 1));
   graphics_fill_rect(ctx, GRect(battery_origin.x + 1, battery_origin.y - 1 - battery_height, 2, battery_height), 0, GCornerNone);
+
+  if(s_bt_connected) {
+    GPoint bt_origin = GPoint(135, 168-3);
+    graphics_draw_line(ctx, GPoint(bt_origin.x + 3, bt_origin.y - 12), GPoint(bt_origin.x + 3, bt_origin.y));
+    graphics_draw_line(ctx, GPoint(bt_origin.x + 3, bt_origin.y - 12), GPoint(bt_origin.x + 6, bt_origin.y - 9));
+    graphics_draw_line(ctx, GPoint(bt_origin.x, bt_origin.y - 3), GPoint(bt_origin.x + 6, bt_origin.y - 9));
+
+    graphics_draw_line(ctx, GPoint(bt_origin.x, bt_origin.y - 9), GPoint(bt_origin.x + 6, bt_origin.y - 3));
+    graphics_draw_line(ctx, GPoint(bt_origin.x + 3, bt_origin.y), GPoint(bt_origin.x + 6, bt_origin.y - 3));
+  }
 }
 
 static void main_window_load(Window *window) {
@@ -160,6 +171,11 @@ static void battery_callback(BatteryChargeState state) {
   layer_mark_dirty(s_canvas_layer);
 }
 
+static void bluetooth_callback(bool connected) {
+  s_bt_connected = connected;
+  layer_mark_dirty(s_canvas_layer);
+}
+
 static void init() {
   s_main_window = window_create();
   window_set_window_handlers(s_main_window, (WindowHandlers) {
@@ -172,6 +188,10 @@ static void init() {
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   battery_state_service_subscribe(battery_callback);
+  connection_service_subscribe((ConnectionHandlers) {
+      .pebble_app_connection_handler = bluetooth_callback
+  });
+  bluetooth_callback(connection_service_peek_pebble_app_connection());
   app_message_open(APP_SYNC_BUFFER_SIZE, APP_SYNC_BUFFER_SIZE);
 }
 
