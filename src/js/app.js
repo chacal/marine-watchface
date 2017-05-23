@@ -5,7 +5,9 @@ var locationOptions = {'timeout': 30000, 'maximumAge': 5 * 60 * 1000, 'enableHig
 
 Pebble.addEventListener('ready', function(e) {
   console.log('On ready!', JSON.stringify(e))
-  updateWeather();
+  var data = {}
+  data[messageKeys.Ready] = "ready"
+  Pebble.sendAppMessage(data, function() { console.log("Sent successfully!")}, function() { console.log("Failed to send!")})
 })
 
 Pebble.addEventListener('appmessage', function(e) {
