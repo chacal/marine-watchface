@@ -15,6 +15,10 @@ static TextLayer *s_pressure_layer;
 static TextLayer *s_pressure_unit_layer;
 static TextLayer *s_observation_station_layer;
 
+#define APP_SYNC_BUFFER_SIZE 128
+static AppSync s_sync;
+static uint8_t s_sync_buffer[APP_SYNC_BUFFER_SIZE];
+
 static void update_time() {
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
@@ -26,6 +30,22 @@ static void update_time() {
   static char s_date_buffer[16];
   strftime(s_date_buffer, sizeof(s_date_buffer), tick_time->tm_mday < 10 ? "%a,%e %b" : "%a, %d %b", tick_time);
   text_layer_set_text(s_date_layer, s_date_buffer);
+}
+
+static void sync_error_callback(DictionaryResult dict_error, AppMessageResult app_message_error, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Sync Error: %d", app_message_error);
+}
+
+static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
+  if(key == MESSAGE_KEY_Wind) {
+    text_layer_set_text(s_wind_layer, new_tuple->value->cstring);
+  } else if(key == MESSAGE_KEY_Temperature) {
+    text_layer_set_text(s_temperature_layer, new_tuple->value->cstring);
+  } else if(key == MESSAGE_KEY_Pressure) {
+    text_layer_set_text(s_pressure_layer, new_tuple->value->cstring);
+  } else if(key == MESSAGE_KEY_ObservationStation) {
+    text_layer_set_text(s_observation_station_layer, new_tuple->value->cstring);
+  }
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -73,6 +93,19 @@ static void main_window_load(Window *window) {
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
+
+  Tuplet initial_values[] = {
+      TupletInteger(MESSAGE_KEY_Ready, (uint8_t)0),
+      TupletCString(MESSAGE_KEY_Wind, "-"),
+      TupletCString(MESSAGE_KEY_Temperature, "-"),
+      TupletCString(MESSAGE_KEY_Pressure, "-"),
+      TupletCString(MESSAGE_KEY_ObservationStation, "-")
+  };
+
+  app_sync_init(&s_sync, s_sync_buffer, sizeof(s_sync_buffer),
+                initial_values, ARRAY_LENGTH(initial_values),
+                sync_tuple_changed_callback, sync_error_callback, NULL
+  );
 }
 
 static void main_window_unload(Window *window) {
@@ -112,11 +145,13 @@ static void init() {
 
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+
+  app_message_open(APP_SYNC_BUFFER_SIZE, APP_SYNC_BUFFER_SIZE);
 }
 
 static void deinit() {
-  // Destroy Window
   window_destroy(s_main_window);
+  app_sync_deinit(&s_sync);
 }
 
 int main(void) {

@@ -17,7 +17,11 @@
       "watchface": true
     },
     "messageKeys": [
-      "dummy"
+      "Ready",
+      "Wind",
+      "Temperature",
+      "Pressure",
+      "ObservationStation"
     ],
     "resources": {
       "media": [
