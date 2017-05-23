@@ -174,7 +174,6 @@ static void battery_callback(BatteryChargeState state) {
 static void bluetooth_callback(bool connected) {
   s_bt_connected = connected;
   layer_mark_dirty(s_canvas_layer);
-  vibes_double_pulse();
 }
 
 static void init() {
