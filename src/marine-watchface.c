@@ -137,26 +137,26 @@ static void main_window_load(Window *window) {
   s_date_layer = create_date_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
-  s_wind_speed_layer = create_forecast_data_layer(GRect(0, 99, 58, 20));
+  s_wind_speed_layer = create_forecast_data_layer(GRect(0, 99, 48, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_wind_speed_layer));
 
-  s_wind_speed_unit_layer = create_forecast_unit_layer(GRect(7, 99+22, 48, 20));
+  s_wind_speed_unit_layer = create_forecast_unit_layer(GRect(0, 99+22, 48, 20));
   text_layer_set_text(s_wind_speed_unit_layer, "m/s");
   layer_add_child(window_layer, text_layer_get_layer(s_wind_speed_unit_layer));
 
-  s_temperature_layer = create_forecast_data_layer(GRect(57, 99, 30, 20));
-  layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
-
-  s_temperature_unit_layer = create_forecast_unit_layer(GRect(48, 99+22, 48, 20));
-  text_layer_set_text(s_temperature_unit_layer, "°C");
-  layer_add_child(window_layer, text_layer_get_layer(s_temperature_unit_layer));
-
-  s_wind_dir_layer = create_forecast_data_layer(GRect(93, 99, 48, 20));
+  s_wind_dir_layer = create_forecast_data_layer(GRect(48, 99, 48, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_wind_dir_layer));
 
-  s_wind_dir_unit_layer = create_forecast_unit_layer(GRect(94, 99+22, 48, 20));
+  s_wind_dir_unit_layer = create_forecast_unit_layer(GRect(48, 99+22, 48, 20));
   text_layer_set_text(s_wind_dir_unit_layer, "°T");
   layer_add_child(window_layer, text_layer_get_layer(s_wind_dir_unit_layer));
+
+  s_temperature_layer = create_forecast_data_layer(GRect(96, 99, 48, 20));
+  layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
+
+  s_temperature_unit_layer = create_forecast_unit_layer(GRect(96, 99+22, 48, 20));
+  text_layer_set_text(s_temperature_unit_layer, "°C");
+  layer_add_child(window_layer, text_layer_get_layer(s_temperature_unit_layer));
 
   s_observation_station_layer = create_forecast_unit_layer(GRect(0, 137, 144, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_observation_station_layer));
