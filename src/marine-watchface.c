@@ -9,10 +9,10 @@ static TextLayer *s_date_layer;
 static TextLayer *s_time_layer;
 static TextLayer *s_wind_speed_layer;
 static TextLayer *s_wind_speed_unit_layer;
+static TextLayer *s_wind_dir_layer;
+static TextLayer *s_wind_dir_unit_layer;
 static TextLayer *s_temperature_layer;
 static TextLayer *s_temperature_unit_layer;
-static TextLayer *s_pressure_layer;
-static TextLayer *s_pressure_unit_layer;
 static TextLayer *s_observation_station_layer;
 static TextLayer *s_last_update_layer;
 static int s_battery_level;
@@ -20,8 +20,8 @@ static bool s_bt_connected;
 static bool s_phone_ready;
 
 static char s_wind_speed_buf[16] = "-";
+static char s_wind_dir_buf[16] = "-";
 static char s_temperature_buf[16] = "-";
-static char s_pressure_buf[16] = "-";
 static char s_observation_station_buf[128] = "-";
 static char s_last_update_buf[16] = "-";
 
@@ -46,12 +46,12 @@ static void update_observation(const uint32_t key) {
   if(key == MESSAGE_KEY_WindSpeed) {
     persist_read_string(MESSAGE_KEY_WindSpeed, s_wind_speed_buf, 16);
     text_layer_set_text(s_wind_speed_layer, s_wind_speed_buf);
+  } else if(key == MESSAGE_KEY_WindDir) {
+    persist_read_string(MESSAGE_KEY_WindDir, s_wind_dir_buf, 16);
+    text_layer_set_text(s_wind_dir_layer, s_wind_dir_buf);
   } else if(key == MESSAGE_KEY_Temperature) {
     persist_read_string(MESSAGE_KEY_Temperature, s_temperature_buf, 16);
     text_layer_set_text(s_temperature_layer, s_temperature_buf);
-  } else if(key == MESSAGE_KEY_Pressure) {
-    persist_read_string(MESSAGE_KEY_Pressure, s_pressure_buf, 16);
-    text_layer_set_text(s_pressure_layer, s_pressure_buf);
   } else if(key == MESSAGE_KEY_ObservationStation) {
     persist_read_string(MESSAGE_KEY_ObservationStation, s_observation_station_buf, 128);
     text_layer_set_text(s_observation_station_layer, s_observation_station_buf);
@@ -151,12 +151,12 @@ static void main_window_load(Window *window) {
   text_layer_set_text(s_temperature_unit_layer, "°C");
   layer_add_child(window_layer, text_layer_get_layer(s_temperature_unit_layer));
 
-  s_pressure_layer = create_forecast_data_layer(GRect(93, 99, 48, 20));
-  layer_add_child(window_layer, text_layer_get_layer(s_pressure_layer));
+  s_wind_dir_layer = create_forecast_data_layer(GRect(93, 99, 48, 20));
+  layer_add_child(window_layer, text_layer_get_layer(s_wind_dir_layer));
 
-  s_pressure_unit_layer = create_forecast_unit_layer(GRect(94, 99+22, 48, 20));
-  text_layer_set_text(s_pressure_unit_layer, "mbar");
-  layer_add_child(window_layer, text_layer_get_layer(s_pressure_unit_layer));
+  s_wind_dir_unit_layer = create_forecast_unit_layer(GRect(94, 99+22, 48, 20));
+  text_layer_set_text(s_wind_dir_unit_layer, "°T");
+  layer_add_child(window_layer, text_layer_get_layer(s_wind_dir_unit_layer));
 
   s_observation_station_layer = create_forecast_unit_layer(GRect(0, 137, 144, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_observation_station_layer));
@@ -172,8 +172,8 @@ static void main_window_load(Window *window) {
       TupletCString(MESSAGE_KEY_Ready, ""),
       TupletInteger(MESSAGE_KEY_LastObservationUpdate, 0),
       TupletCString(MESSAGE_KEY_WindSpeed, ""),
+      TupletCString(MESSAGE_KEY_WindDir, ""),
       TupletCString(MESSAGE_KEY_Temperature, ""),
-      TupletCString(MESSAGE_KEY_Pressure, ""),
       TupletCString(MESSAGE_KEY_ObservationStation, "")
   };
 
@@ -190,8 +190,8 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(s_wind_speed_unit_layer);
   text_layer_destroy(s_temperature_layer);
   text_layer_destroy(s_temperature_unit_layer);
-  text_layer_destroy(s_pressure_layer);
-  text_layer_destroy(s_pressure_unit_layer);
+  text_layer_destroy(s_wind_dir_layer);
+  text_layer_destroy(s_wind_dir_unit_layer);
   text_layer_destroy(s_observation_station_layer);
   text_layer_destroy(s_last_update_layer);
   layer_destroy(s_canvas_layer);

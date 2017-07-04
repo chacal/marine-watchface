@@ -44,6 +44,7 @@ function updateWeather() {
 
       var data = {}
       data[messageKeys.WindSpeed] = result.observations.windSpeedMs.toFixed(1) + ''
+      data[messageKeys.WindDir] = Math.round(result.observations.windDir) + ''
       data[messageKeys.Temperature] = Math.round(result.observations.temperature) + ''
       data[messageKeys.Pressure] = Math.round(result.observations.pressureMbar) + ''
       data[messageKeys.ObservationStation] = result.station.name
