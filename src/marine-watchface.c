@@ -7,8 +7,8 @@ static Window *s_main_window;
 static Layer *s_canvas_layer;
 static TextLayer *s_date_layer;
 static TextLayer *s_time_layer;
-static TextLayer *s_wind_layer;
-static TextLayer *s_wind_unit_layer;
+static TextLayer *s_wind_speed_layer;
+static TextLayer *s_wind_speed_unit_layer;
 static TextLayer *s_temperature_layer;
 static TextLayer *s_temperature_unit_layer;
 static TextLayer *s_pressure_layer;
@@ -19,7 +19,7 @@ static int s_battery_level;
 static bool s_bt_connected;
 static bool s_phone_ready;
 
-static char s_wind_buf[16] = "-";
+static char s_wind_speed_buf[16] = "-";
 static char s_temperature_buf[16] = "-";
 static char s_pressure_buf[16] = "-";
 static char s_observation_station_buf[128] = "-";
@@ -43,9 +43,9 @@ static void update_time() {
 }
 
 static void update_observation(const uint32_t key) {
-  if(key == MESSAGE_KEY_Wind) {
-    persist_read_string(MESSAGE_KEY_Wind, s_wind_buf, 16);
-    text_layer_set_text(s_wind_layer, s_wind_buf);
+  if(key == MESSAGE_KEY_WindSpeed) {
+    persist_read_string(MESSAGE_KEY_WindSpeed, s_wind_speed_buf, 16);
+    text_layer_set_text(s_wind_speed_layer, s_wind_speed_buf);
   } else if(key == MESSAGE_KEY_Temperature) {
     persist_read_string(MESSAGE_KEY_Temperature, s_temperature_buf, 16);
     text_layer_set_text(s_temperature_layer, s_temperature_buf);
@@ -137,12 +137,12 @@ static void main_window_load(Window *window) {
   s_date_layer = create_date_layer();
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
-  s_wind_layer = create_forecast_data_layer(GRect(0, 99, 58, 20));
-  layer_add_child(window_layer, text_layer_get_layer(s_wind_layer));
+  s_wind_speed_layer = create_forecast_data_layer(GRect(0, 99, 58, 20));
+  layer_add_child(window_layer, text_layer_get_layer(s_wind_speed_layer));
 
-  s_wind_unit_layer = create_forecast_unit_layer(GRect(7, 99+22, 48, 20));
-  text_layer_set_text(s_wind_unit_layer, "m/s");
-  layer_add_child(window_layer, text_layer_get_layer(s_wind_unit_layer));
+  s_wind_speed_unit_layer = create_forecast_unit_layer(GRect(7, 99+22, 48, 20));
+  text_layer_set_text(s_wind_speed_unit_layer, "m/s");
+  layer_add_child(window_layer, text_layer_get_layer(s_wind_speed_unit_layer));
 
   s_temperature_layer = create_forecast_data_layer(GRect(57, 99, 30, 20));
   layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
@@ -171,7 +171,7 @@ static void main_window_load(Window *window) {
   Tuplet initial_values[] = {
       TupletCString(MESSAGE_KEY_Ready, ""),
       TupletInteger(MESSAGE_KEY_LastObservationUpdate, 0),
-      TupletCString(MESSAGE_KEY_Wind, ""),
+      TupletCString(MESSAGE_KEY_WindSpeed, ""),
       TupletCString(MESSAGE_KEY_Temperature, ""),
       TupletCString(MESSAGE_KEY_Pressure, ""),
       TupletCString(MESSAGE_KEY_ObservationStation, "")
@@ -186,8 +186,8 @@ static void main_window_load(Window *window) {
 static void main_window_unload(Window *window) {
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_time_layer);
-  text_layer_destroy(s_wind_layer);
-  text_layer_destroy(s_wind_unit_layer);
+  text_layer_destroy(s_wind_speed_layer);
+  text_layer_destroy(s_wind_speed_unit_layer);
   text_layer_destroy(s_temperature_layer);
   text_layer_destroy(s_temperature_unit_layer);
   text_layer_destroy(s_pressure_layer);

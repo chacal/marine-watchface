@@ -43,7 +43,7 @@ function updateWeather() {
       var result = JSON.parse(responseText)
 
       var data = {}
-      data[messageKeys.Wind] = Math.round(result.observations.windSpeedMs) + ' ' + windrose.getPoint(result.observations.windDir, {depth: 1}).symbol
+      data[messageKeys.WindSpeed] = result.observations.windSpeedMs.toFixed(1) + ''
       data[messageKeys.Temperature] = Math.round(result.observations.temperature) + ''
       data[messageKeys.Pressure] = Math.round(result.observations.pressureMbar) + ''
       data[messageKeys.ObservationStation] = result.station.name
